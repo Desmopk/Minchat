@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "249567301650",
+    "project_id": "sample-66925",
+    "storage_bucket": "sample-66925.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:249567301650:android:642aa816b2ab69cdd708cb",
+        "android_client_info": {
+          "package_name": "com.app.minchat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDMiOC9NVFk9Rq-df8CMPe0YeAEcN3YHEc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
