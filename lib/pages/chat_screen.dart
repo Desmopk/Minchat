@@ -1,11 +1,14 @@
-import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'websocket_service.dart';
+import 'package:minchat/pages/websocket_service.dart';
+
+import 'auth_service.dart';
 
 class ChatScreen extends StatefulWidget {
-  final WebsocketService webSocketService;
+  final User? user;
+  final UserModel peer;
 
-  const ChatScreen({required this.webSocketService,super.key});
+  const ChatScreen({required this.user, required this.peer,super.key});
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -14,12 +17,13 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final List<String> _messages = [];
+  final WebSocketService _webSocketService = WebSocketService();
 
   @override
   void initState() {
     super.initState();
-
-    widget.webSocketService.channel.stream.listen((message) {
+    _webSocketService.connect('ws://192.168.1.5:8080'); // Change this to your server's IP
+    _webSocketService.stream.listen((message) {
       setState(() {
         _messages.add(message);
       });
@@ -28,49 +32,33 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void _sendMessage() {
     if (_controller.text.isNotEmpty) {
-      widget.webSocketService.sendMessage(_controller.text);
+      _webSocketService.sendMessage(_controller.text);
       _controller.clear();
     }
   }
 
   @override
   void dispose() {
-    widget.webSocketService.dispose();
+    _webSocketService.disconnect();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(centerTitle: true,leading: const Icon(Icons.chat_outlined),
-        title: const Text('Chat Screen'),actions: [IconButton(onPressed: (){exit(0);}, icon: const Icon(Icons.exit_to_app_outlined))],
+      appBar: AppBar(
+        title: Text('Chat with ${widget.peer.uid}'),
       ),
       body: Stack(
-        children: <Widget>[
+        children: [
           Padding(
             padding: const EdgeInsets.only(bottom: 60),
             child: ListView.builder(
               itemCount: _messages.length,
               itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          IntrinsicWidth(
-                            child: ListTile(minLeadingWidth: 0,
-                                          horizontalTitleGap: 0,
-                              title: Text(_messages[index]),
-                              tileColor: const Color.fromRGBO(230, 230, 234, 1),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10,)
-                    ],
-                  ),
+                return ListTile(
+                  title: Text(_messages[index]),
+                  tileColor: Colors.grey[300],
                 );
               },
             ),
@@ -83,14 +71,11 @@ class _ChatScreenState extends State<ChatScreen> {
               color: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
               child: Row(
-                children: <Widget>[
+                children: [
                   Expanded(
                     child: TextField(
                       controller: _controller,
-                      decoration: const InputDecoration(
-                        hintText: 'Type a message...',
-                        border: InputBorder.none,
-                      ),
+                      decoration: const InputDecoration(hintText: 'Type a message...'),
                     ),
                   ),
                   IconButton(

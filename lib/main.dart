@@ -1,23 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:minchat/pages/chat_screen.dart';
-import 'package:minchat/pages/websocket_service.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:minchat/pages/home_page.dart';
 
-void main()
-{
-  return runApp(MinChat());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(MyApp());
 }
-class MinChat extends StatelessWidget {
-  final WebsocketService webSocketService = WebsocketService('ws://echo.websocket.org/.ws');
 
-  MinChat({super.key});
-
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: ChatScreen(webSocketService: webSocketService,),
-      theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.grey)),
+      title: 'Minchat App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: HomePage(),
     );
   }
 }
-
